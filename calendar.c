@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define BEGIN_EPOCH 1900
 
@@ -12,37 +13,41 @@ void print_header();
 void current_year_calendar();
 void print_custom_calendar(int* year);
 void print_spaces(int first_day);
+void quit();
+
 
 int main(){
     while(1){
         int choice = 0, result = 0;
         printf("To display calendar of the current month, enter 1\n");
-        printf("To display the calendar of any year starting from 1900, enter 2\n");
-        result = scanf("%d", &choice);
+        printf("To display the calendar of any year starting from 1900, enter 2\nTo quit, enter 3\n");
+	result = scanf("%d", &choice);
         if(result == 1){
-            if(choice == 1) {
-                current_year_calendar();
-                break;
-            }
-            else if(choice == 2){
-                int user_year = 0, inp_res = 0;
-                printf("Please, enter any number greater(or equal) than 1900:\n");
-                while(1){
-                    inp_res = scanf("%d", &user_year);
-                    if(inp_res == 1){
-                        if(user_year >= BEGIN_EPOCH){
-                            break;
-                        }
-                        else printf("Number must not be less than 1900\n\n");
-                        
-                    }
-                    else printf("Wrong input\n\n");
-                    
-                }
-                print_custom_calendar(&user_year);
-            }
-            else printf("Wrong input\n\n");
-            
+            switch(choice){
+	    	case 1:
+			current_year_calendar();
+			break;
+		case 2: {
+			int user_year = 0, inp_res = 0;
+			printf("Please, enter any number greater(or equal) than %d:\n", BEGIN_EPOCH);
+			while(1){
+				inp_res = scanf("%d", &user_year);
+				if(inp_res == 1){
+					if(user_year >= BEGIN_EPOCH) 
+						break;
+					else printf("Number must not be less than %d\n\n", BEGIN_EPOCH);
+				}
+				else printf("Wrong input\n\n");
+			}
+			print_custom_calendar(&user_year);
+			break;
+		}
+		case 3:
+			quit();
+		default:
+			printf("Wrong input\n\n");
+			break;
+	    }
         }
         else{
             printf("Wrong input type\n\n");
@@ -70,7 +75,7 @@ int get_days_in_month(int month_n, int year){
 }
 
 void print_header(){
-    printf("Mo Tu We Th Fr \033[1;30mSa\033[0m \033[1;31mSu\033[0m\n");//gray for Sa, red for Su   
+    printf("Mo Tu We Th Fr \033[1;31mSa\033[0m \033[1;31mSu\033[0m\n");//gray for Sa, red for Su   
 }
 
 void print_spaces(int first_day){
@@ -107,12 +112,12 @@ void current_year_calendar(){
         if(i == day){
             printf("\033[1;37;44m%2d\033[0m ",i);
         }
-        else if((i + first_day - 1) % 7 == 0){
+        else if((i + first_day - 1) % 7 == 0 || (i + first_day) % 7 == 0){
             printf("\033[1;31m%2d\033[0m ", i);
         }
-        else if((i + first_day) % 7 == 0){
+        /*else if((i + first_day) % 7 == 0){
             printf("\033[1;30m%2d\033[0m ", i);
-        }
+        }*/
         else printf("%2d ", i);
 
         if((weekday++) % 7 == 0) printf("\n");
@@ -144,12 +149,12 @@ void print_custom_calendar(int* year){
         print_spaces(weekday);
 
         for(int day = 1; day <= days_in_month; ++day){
-            if((day + first_day - 1) % 7 == 0){
+            if((day + first_day - 1) % 7 == 0 || (day + first_day) % 7 == 0){
             printf("\033[1;31m%2d\033[0m ", day);
         }
-        else if((day + first_day) % 7 == 0){
+        /*else if((day + first_day) % 7 == 0){
             printf("\033[1;30m%2d\033[0m ", day);
-        }
+        }*/
         else printf("%2d ", day);
 
         if((weekday++) % 7 == 0) printf("\n");
@@ -157,4 +162,9 @@ void print_custom_calendar(int* year){
 
         printf("\n\n");
     }
+}
+
+void quit(){
+    printf("\x1b[2JGoodbye!\n\n"); //clear terminal and say goodbye
+    exit(0);
 }
